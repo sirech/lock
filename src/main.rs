@@ -1,8 +1,20 @@
 #[macro_use]
 extern crate clap;
 
+extern crate file_lock;
+
+use chrono::prelude::*;
+use file_lock::FileLock;
+use std::io::prelude::*;
+
 #[derive(Debug)]
 struct LockError;
+
+impl From<std::io::Error> for LockError {
+    fn from(_error: std::io::Error) -> Self {
+        LockError
+    }
+}
 
 fn value_of<'a>(matches: &'a clap::ArgMatches, name: &str) -> Result<&'a str, LockError> {
     match matches.value_of(name) {
@@ -22,7 +34,10 @@ fn main() -> Result<(), LockError> {
     let cmd = value_of(&matches, "CMD")?;
     let lock = value_of(&matches, "LOCK")?;
 
-    println!("{} - {}", cmd, lock);
+    let mut file_lock = FileLock::lock(lock, true, true)?;
+    file_lock
+        .file
+        .write_all(format!("command[{}] - last run[{:?}]", cmd, Local::now()).as_bytes())?;
 
     Ok(())
 }
