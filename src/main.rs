@@ -6,21 +6,31 @@ extern crate file_lock;
 use chrono::prelude::*;
 use file_lock::FileLock;
 use std::io::prelude::*;
+use std::io::Error;
+use std::process::{Command, Output};
 
 #[derive(Debug)]
-struct LockError;
+enum LockError {
+    Argument(),
+    Io(std::io::Error),
+}
 
-impl From<std::io::Error> for LockError {
-    fn from(_error: std::io::Error) -> Self {
-        LockError
+impl From<Error> for LockError {
+    fn from(error: Error) -> Self {
+        LockError::Io(error)
     }
 }
 
 fn value_of<'a>(matches: &'a clap::ArgMatches, name: &str) -> Result<&'a str, LockError> {
     match matches.value_of(name) {
-        None => Err(LockError),
+        None => Err(LockError::Argument()),
         Some(v) => Ok(v),
     }
+}
+
+fn command(cmd: &str) -> Result<Output, Error> {
+    let cmd: Vec<&str> = cmd.split_whitespace().collect();
+    Command::new(cmd[0]).args(&cmd[1..]).output()
 }
 
 fn main() -> Result<(), LockError> {
@@ -35,6 +45,11 @@ fn main() -> Result<(), LockError> {
     let lock = value_of(&matches, "LOCK")?;
 
     let mut file_lock = FileLock::lock(lock, true, true)?;
+
+    println!("** Executing command: {} **", cmd);
+    let output = command(cmd)?;
+    std::io::stdout().write_all(&output.stdout)?;
+
     file_lock
         .file
         .write_all(format!("command[{}] - last run[{:?}]", cmd, Local::now()).as_bytes())?;
