@@ -1,9 +1,8 @@
 #[macro_use]
 extern crate clap;
 
-extern crate file_lock;
-
 use chrono::prelude::*;
+use colored::*;
 use file_lock::FileLock;
 use std::io::prelude::*;
 use std::io::Error;
@@ -44,10 +43,10 @@ fn main() -> Result<(), LockError> {
     let cmd = value_of(&matches, "CMD")?;
     let lock = value_of(&matches, "LOCK")?;
 
-    println!("** Acquiring lock file: {} **", lock);
+    println!("** Acquiring lock file: {} **", lock.blue());
     let mut file_lock = FileLock::lock(lock, true, true)?;
 
-    println!("** Executing command: {} **", cmd);
+    println!("** Executing command: {} **", cmd.yellow());
     let output = command(cmd)?;
     std::io::stdout().write_all(&output.stdout)?;
 
