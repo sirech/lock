@@ -7,7 +7,7 @@ set -o pipefail
 SCRIPT_DIR=$(cd "$(dirname "$0")" ; pwd -P)
 EXECUTABLE=$(basename "$SCRIPT_DIR")
 
-goal_check-requirements() {
+_pretest() {
   type bats > /dev/null 2>&1 || { echo "run brew install bats to install bats"; exit 1; }
   type "${EXECUTABLE}" > /dev/null 2>&1 || { echo "run ./go install-cli to install the executable"; exit 1; }
 }
@@ -17,8 +17,15 @@ goal_install-cli() {
 }
 
 goal_test() {
-  goal_check-requirements
+  _pretest
   bats tests.bats
+}
+
+goal_build-release() {
+  TARGET=x86_64-unknown-linux-musl
+  # Dark sorcery to get a binary that can be used in linux
+  CC_x86_64_unknown_linux_musl="x86_64-linux-musl-gcc" cargo build --release --target=$TARGET
+  upx -9 "target/$TARGET/release/$EXECUTABLE"
 }
 
 validate-args() {
