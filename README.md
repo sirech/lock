@@ -4,7 +4,7 @@ This is a CLI tool that allows to run a command after acquiring a file lock, all
 
 ## Why?
 
-This is born out of [CircleCI](https://circleci.com/) running multiple pipelines at the same time due to [Dependabot](https://dependabot.com/) updates. This in the end would cause `docker-compose` to be run multiple times in parallel, which seems to cause some timeout errors. This way, everybody should wait their turn.
+It's born out of [CircleCI](https://circleci.com/) running multiple pipelines at the same time due to [Dependabot](https://dependabot.com/) updates. This in the end would cause `docker-compose` to be run multiple times in parallel, which seems to cause some timeout errors. Now, everybody should wait for their turn.
 
 ## How to build it
 
