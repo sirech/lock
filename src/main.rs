@@ -33,12 +33,14 @@ fn command(cmd: &str) -> Result<Output, Error> {
 }
 
 fn main() -> Result<(), LockError> {
-    let matches: clap::ArgMatches = clap_app!(app =>
-                            (version: "0.0.1")
-                            (@arg CMD: -c --command <command> +takes_value "Command to run")
-                            (@arg LOCK: -l --lock <file> +takes_value "File to use as lock")
+    let matches: clap::ArgMatches = clap_app!(lock =>
+                                              (version: "0.0.1")
+                                              (author: "Mario Fernandez")
+                                              (about: "Runs a command after acquiring a file lock")
+                                              (@arg CMD: -c --command <command> +takes_value "Command to run")
+                                              (@arg LOCK: -l --lock <file> +takes_value "File to use as lock")
     )
-    .get_matches();
+        .get_matches();
 
     let cmd = value_of(&matches, "CMD")?;
     let lock = value_of(&matches, "LOCK")?;
