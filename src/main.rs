@@ -44,6 +44,7 @@ fn main() -> Result<(), LockError> {
     let cmd = value_of(&matches, "CMD")?;
     let lock = value_of(&matches, "LOCK")?;
 
+    println!("** Acquiring lock file: {} **", lock);
     let mut file_lock = FileLock::lock(lock, true, true)?;
 
     println!("** Executing command: {} **", cmd);
