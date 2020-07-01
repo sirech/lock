@@ -14,6 +14,15 @@
   [ "$status" -eq 1 ]
 }
 
+@test "fails on nonsensical command" {
+  lockfile=/tmp/lock.$$
+  cmd='hello echo'
+  run lock -c "$cmd" -l $lockfile
+
+  [ "$status" -eq 1 ]
+  [[ "${lines[2]}" =~ "No such file or directory" ]]
+}
+
 @test "outputs the lockfile being used" {
   lockfile=/tmp/lock.$$
   cmd='echo hello'
